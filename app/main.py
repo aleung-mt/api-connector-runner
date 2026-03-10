@@ -1,6 +1,6 @@
 from app.config import load_config
 from app.logger import setup_logger
-from app.api_client import build_endpoint, fetch_first_page, get_nested_value
+from app.api_client import build_endpoint, fetch_all_pages
 
 
 def main():
@@ -29,25 +29,18 @@ def main():
     endpoint = build_endpoint(config.endpoint_template, config.form_guid)
     logger.info("Built endpoint: %s", endpoint)
 
-    payload = fetch_first_page(
+    all_results = fetch_all_pages(
         api_base_url=config.api_base_url,
         endpoint=endpoint,
         bearer_token=config.api_bearer_token,
         page_size=config.page_size,
+        results_path=config.results_path,
+        next_cursor_path=config.next_cursor_path,
+        logger=logger,
     )
 
-    results = get_nested_value(payload, config.results_path)
-    next_cursor = get_nested_value(payload, config.next_cursor_path)
-
-    if results is None:
-        raise ValueError(f"RESULTS_PATH '{config.results_path}' not found in API response")
-
-    if not isinstance(results, list):
-        raise ValueError(f"RESULTS_PATH '{config.results_path}' did not resolve to a list")
-
-    logger.info("Fetched first page successfully")
-    logger.info("Records returned on first page: %s", len(results))
-    logger.info("Next cursor present: %s", "yes" if next_cursor else "no")
+    logger.info("Full extraction completed successfully")
+    logger.info("Total records fetched across all pages: %s", len(all_results))
 
 
 if __name__ == "__main__":
