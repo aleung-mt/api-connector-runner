@@ -42,7 +42,7 @@ def load_config() -> ConnectorConfig:
         bq_raw_table=get_env("BQ_RAW_TABLE"),
         bq_run_log_table=get_env("BQ_RUN_LOG_TABLE"),
         load_mode=get_env("LOAD_MODE"),
-        api_bearer_token=get_env("API_BEARER_TOKEN"),
+        api_bearer_token=get_env("API_BEARER_TOKEN").strip(),
     )
 
     validate_config(config)
